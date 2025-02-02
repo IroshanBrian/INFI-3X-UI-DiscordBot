@@ -1,5 +1,10 @@
 import { CommandInteraction, GuildMember } from "discord.js";
-import logger from "../../utils/logger";
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
+
+
+const API_URL = `https://${process.env.HOST}:${process.env.PORT}/${process.env.WEBBASEPATH}/login`;
 
 export const auth = async (interaction: CommandInteraction) => {
     if (!(interaction.member instanceof GuildMember)) {
@@ -24,12 +29,34 @@ export const auth = async (interaction: CommandInteraction) => {
     const username = interaction.options.get('username')?.value as string;
     const password = interaction.options.get('password')?.value as string;
 
+    try {
 
-    if (username === "admin" && password === "password") {
-        await interaction.reply("✅ Login successful!");
-        logger.info(`User ${username} logged in.!`)
-    } else {
-        await interaction.reply("❌ Invalid username or password.");
-        logger.error(`Invalid username or password.`)
+        const response = await axios.post(API_URL, new URLSearchParams({
+            username: username,
+            password: password,
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+        });
+
+        console.log(response.headers);
+
+        if (response.status === 200 && response.data) {
+
+            const sessionCookie = response.headers['set-cookie']?.find(cookie => cookie.startsWith('3x-ui='));
+
+            if (sessionCookie) {
+                await interaction.reply("Login successful! Your session ID has been created.");
+            } else {
+                await interaction.reply("Session ID could not be retrieved.");
+            }
+        } else {
+            await interaction.reply("❌ Invalid username or password.");
+        }
+    } catch (error) {
+        console.error("Login error:", error);
+        await interaction.reply("❌ There was an error with the login process. Please try again.");
     }
 };
