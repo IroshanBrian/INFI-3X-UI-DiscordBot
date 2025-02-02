@@ -11,6 +11,17 @@ const commands = [
     new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Replies with Pong!"),
+    new SlashCommandBuilder()
+        .setName('login')
+        .setDescription('Login to your x-ui')
+        .addStringOption(option =>
+            option.setName('username')
+                .setDescription('Your username')
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName('password')
+                .setDescription('Your password')
+                .setRequired(true)),
 ].map(command => command.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);

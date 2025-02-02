@@ -3,10 +3,15 @@ import dotenv from "dotenv";
 import { handlePing } from "./functions/handlePing";
 import { registerCommands } from "./commands/registerCommands";
 import logger from "../utils/logger";
+import { auth } from "./functions/auth";
 
 dotenv.config();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds
+    ]
+});
 
 client.once("ready", async () => {
     logger.info(`Logged in as ${client.user?.tag}!`);
@@ -20,6 +25,9 @@ client.on("interactionCreate", async (interaction) => {
         switch (interaction.commandName) {
             case "ping":
                 await handlePing(interaction);
+                break;
+            case "login":
+                await auth(interaction);
                 break;
             default:
                 await interaction.reply("Unknown command.");
