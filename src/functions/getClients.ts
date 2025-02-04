@@ -66,7 +66,15 @@ export const getClients = async (interaction: CommandInteraction) => {
 
         if (Array.isArray(clients) && clients.length > 0) {
           clients.forEach((client: any) => {
-            clientDetails += `📧 **Email:** ${client.email}\n💾 **Total GB:** ${client.totalGB}\n\n`;
+            clientDetails += `📧 Email: ${client.email}\n💾 Total GB: ${client.totalGB}\n\n`;
+          });
+
+          // Wrap the clientDetails in a code block
+          const formattedDetails = `\`\`\`\n${clientDetails}\`\`\``;
+
+          interaction.reply({
+            content: `✅ Here are the client details:\n${formattedDetails}`,
+            ephemeral: true,
           });
         }
       });
