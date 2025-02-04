@@ -49,10 +49,10 @@ export const auth = async (interaction: CommandInteraction) => {
     if (response.status === 200 && response.data) {
       console.log(response.headers);
 
-      // Get the second cookie from the 'set-cookie' array
+
       const cookies = response.headers["set-cookie"];
       if (cookies && cookies.length >= 2) {
-        const secondCookie = cookies[1]; // Index 1 for the second cookie
+        const secondCookie = cookies[1];
         const tokenMatch = secondCookie.match(/3x-ui=([^;]+)/);
 
         if (tokenMatch) {
