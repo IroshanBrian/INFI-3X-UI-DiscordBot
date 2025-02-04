@@ -26,9 +26,7 @@ const commands = [
         .setDescription("Your password")
         .setRequired(true)
     ),
-  new SlashCommandBuilder()
-    .setName("get_inbounds")
-    .setDescription("Get all inbounds"),
+  new SlashCommandBuilder().setName("list").setDescription("Get all inbounds"),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);

@@ -28,7 +28,7 @@ client.on("interactionCreate", async (interaction) => {
       case "login":
         await auth(interaction);
         break;
-      case "get_inbounds":
+      case "list":
         await getClients(interaction);
         break;
       default:

@@ -1,8 +1,8 @@
 import { CommandInteraction, GuildMember } from "discord.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import logger from "../../utils/logger";
 dotenv.config();
-
 
 const userSessions = new Map<string, string>();
 const API_URL = `https://${process.env.HOST}:${process.env.PORT}/${process.env.WEBBASEPATH}/login`;
@@ -47,9 +47,6 @@ export const auth = async (interaction: CommandInteraction) => {
     );
 
     if (response.status === 200 && response.data) {
-      console.log(response.headers);
-
-
       const cookies = response.headers["set-cookie"];
       if (cookies && cookies.length >= 2) {
         const secondCookie = cookies[1];
@@ -57,11 +54,9 @@ export const auth = async (interaction: CommandInteraction) => {
 
         if (tokenMatch) {
           const sessionCookie = tokenMatch[1];
-          console.log(sessionCookie);
-
           if (sessionCookie) {
             userSessions.set(interaction.user.id, sessionCookie);
-            console.log(userSessions);
+            logger.info(`User ${interaction.user.id} logged in.`);
             await interaction.reply(
               "✅ Login successful! Your session ID has been created."
             );
@@ -86,6 +81,5 @@ export const auth = async (interaction: CommandInteraction) => {
 };
 
 export const getUserSession = (userId: string): string | undefined => {
-  console.log(userSessions);
   return userSessions.get(userId);
 };
