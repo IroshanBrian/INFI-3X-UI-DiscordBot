@@ -5,6 +5,7 @@ import { registerCommands } from "./commands/registerCommands";
 import logger from "../utils/logger";
 import { auth } from "./functions/auth";
 import { getClients } from "./functions/getClients";
+import { getOnlineClients } from "./functions/getOnlineClients";
 
 dotenv.config();
 
@@ -30,6 +31,9 @@ client.on("interactionCreate", async (interaction) => {
         break;
       case "list":
         await getClients(interaction);
+        break;
+      case "online":
+        await getOnlineClients(interaction);
         break;
       default:
         await interaction.reply("Unknown command.");

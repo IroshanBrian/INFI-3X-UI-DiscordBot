@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 import { getUserSession } from "./auth";
 dotenv.config();
 
-const API_URL = `https://${process.env.HOST}:${process.env.PORT}/panel/api/inbounds/list`;
+const API_URL = `https://${process.env.HOST}:${process.env.PORT}/panel/api/inbounds/onlines`;
 
-export const getClients = async (interaction: CommandInteraction) => {
+export const getOnlineClients = async (interaction: CommandInteraction) => {
   if (!(interaction.member instanceof GuildMember)) {
     await interaction.reply({
       content: "❌ You must be a member of the server to use this.",
@@ -36,7 +36,7 @@ export const getClients = async (interaction: CommandInteraction) => {
     return;
   }
 
-  const sessionToken = sessionCookieRaw;
+  const sessionToken = sessionCookieRaw.trim();
 
   if (!sessionToken) {
     console.error("❌ Failed to extract session token!");
@@ -48,47 +48,37 @@ export const getClients = async (interaction: CommandInteraction) => {
   }
 
   try {
-    const response = await axios.get(API_URL, {
-      headers: {
-        Accept: "application/json",
-        Cookie: `3x-ui=${sessionToken}`,
-      },
-    });
+    const response = await axios.post(
+      API_URL,
+      {},
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Cookie: `3x-ui=${sessionToken}`,
+        },
+        timeout: 5000,
+      }
+    );
 
     const inbounds = response.data.obj;
 
     if (Array.isArray(inbounds) && inbounds.length > 0) {
-      let clientDetails = "";
-
-      inbounds.forEach((inbound: any) => {
-        const settings = JSON.parse(inbound.settings);
-        const clients = settings.clients;
-
-        if (Array.isArray(clients) && clients.length > 0) {
-          clients.forEach((client: any) => {
-            clientDetails += `📧 Email: ${client.email}\n💾 Total GB: ${client.totalGB}\n\n`;
-          });
-
-          interaction.reply({
-            content: `✅ Here are the client details:\n${clientDetails}`,
-            flags: 64,
-          });
-        }
+      await interaction.reply({
+        content: `🌐 Online clients: ${inbounds.join(", ")}`,
       });
     } else {
       await interaction.reply({
-        content: "❌ No inbounds available.",
-        flags: 64,
+        content: "🔍 No online clients found.",
       });
     }
   } catch (error: any) {
     console.error(
-      "❌ Error fetching inbounds:",
+      "❌ Failed to fetch online clients:",
       error?.response?.data || error.message
     );
     await interaction.reply({
-      content:
-        "❌ Failed to retrieve inbounds. Please ensure you're logged in.",
+      content: "❌ An error occurred while fetching online clients.",
       flags: 64,
     });
   }

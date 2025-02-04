@@ -5,7 +5,7 @@ import logger from "../../utils/logger";
 dotenv.config();
 
 const userSessions = new Map<string, string>();
-const API_URL = `https://${process.env.HOST}:${process.env.PORT}/${process.env.WEBBASEPATH}/login`;
+const API_URL = `https://${process.env.HOST}:${process.env.PORT}/login`;
 
 export const auth = async (interaction: CommandInteraction) => {
   if (!(interaction.member instanceof GuildMember)) {
