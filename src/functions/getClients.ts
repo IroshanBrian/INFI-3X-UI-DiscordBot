@@ -69,27 +69,12 @@ export const getClients = async (interaction: CommandInteraction) => {
             clientDetails += `📧 Email: ${client.email}\n💾 Total GB: ${client.totalGB}\n\n`;
           });
 
-          // Wrap the clientDetails in a code block
-          const formattedDetails = `\`\`\`\n${clientDetails}\`\`\``;
-
           interaction.reply({
-            content: `✅ Here are the client details:\n${formattedDetails}`,
+            content: `✅ Here are the client details:\n${clientDetails}`,
             ephemeral: true,
           });
         }
       });
-
-      if (clientDetails) {
-        await interaction.reply({
-          content: `✅ Here are the client details:\n${clientDetails}`,
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content: "❌ No client details found.",
-          ephemeral: true,
-        });
-      }
     } else {
       await interaction.reply({
         content: "❌ No inbounds available.",
