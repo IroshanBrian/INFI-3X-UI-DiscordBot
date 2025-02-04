@@ -48,20 +48,31 @@ export const auth = async (interaction: CommandInteraction) => {
 
     if (response.status === 200 && response.data) {
       console.log(response.headers);
-      const token = response.headers["set-cookie"]?.find((cookie) =>
-        cookie.startsWith("3x-ui=")
-      );
 
-      const sessionCookie = token?.match(/3x-ui=([^;]+)/)?.[1] || null;
-      console.log(sessionCookie);
-      if (sessionCookie) {
-        userSessions.set(interaction.user.id, sessionCookie);
-        console.log(userSessions);
-        await interaction.reply(
-          "✅ Login successful! Your session ID has been created."
-        );
+      // Get the second cookie from the 'set-cookie' array
+      const cookies = response.headers["set-cookie"];
+      if (cookies && cookies.length >= 2) {
+        const secondCookie = cookies[1]; // Index 1 for the second cookie
+        const tokenMatch = secondCookie.match(/3x-ui=([^;]+)/);
+
+        if (tokenMatch) {
+          const sessionCookie = tokenMatch[1];
+          console.log(sessionCookie);
+
+          if (sessionCookie) {
+            userSessions.set(interaction.user.id, sessionCookie);
+            console.log(userSessions);
+            await interaction.reply(
+              "✅ Login successful! Your session ID has been created."
+            );
+          } else {
+            await interaction.reply("❌ Session ID could not be retrieved.");
+          }
+        } else {
+          await interaction.reply("❌ Token not found in the second cookie.");
+        }
       } else {
-        await interaction.reply("❌ Session ID could not be retrieved.");
+        await interaction.reply("❌ Not enough cookies in the response.");
       }
     } else {
       await interaction.reply("❌ Invalid username or password.");

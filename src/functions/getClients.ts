@@ -27,7 +27,6 @@ export const getClients = async (interaction: CommandInteraction) => {
   }
 
   const sessionCookieRaw = getUserSession(interaction.user.id);
-  console.log("Raw Session Cookie:", sessionCookieRaw);
 
   if (!sessionCookieRaw) {
     await interaction.reply({
@@ -56,18 +55,33 @@ export const getClients = async (interaction: CommandInteraction) => {
       },
     });
 
-    console.log("API Response:", response.data);
-
-    const inbounds = response.data;
+    const inbounds = response.data.obj;
 
     if (Array.isArray(inbounds) && inbounds.length > 0) {
-      const inboundList = inbounds
-        .map((inbound: any) => `${inbound.name}`)
-        .join("\n");
-      await interaction.reply({
-        content: `✅ Here are the available inbounds:\n${inboundList}`,
-        ephemeral: true,
+      let clientDetails = "";
+
+      inbounds.forEach((inbound: any) => {
+        const settings = JSON.parse(inbound.settings);
+        const clients = settings.clients;
+
+        if (Array.isArray(clients) && clients.length > 0) {
+          clients.forEach((client: any) => {
+            clientDetails += `📧 **Email:** ${client.email}\n💾 **Total GB:** ${client.totalGB}\n\n`;
+          });
+        }
       });
+
+      if (clientDetails) {
+        await interaction.reply({
+          content: `✅ Here are the client details:\n${clientDetails}`,
+          ephemeral: true,
+        });
+      } else {
+        await interaction.reply({
+          content: "❌ No client details found.",
+          ephemeral: true,
+        });
+      }
     } else {
       await interaction.reply({
         content: "❌ No inbounds available.",
